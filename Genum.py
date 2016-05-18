@@ -1,6 +1,13 @@
-from anki.hooks import addHook, wrap
-from aqt.utils import showInfo
 from pprint import pprint
+
+from anki.hooks import addHook
+from aqt.utils import showInfo
+
+from GenumCore.vendor.pythonyandextranslate import yandex_translate
+
+translator = yandex_translate.YandexTranslate(
+    key='trnsl.1.1.20160518T163740Z.4a96ea038dcee5ab.1765897e66cff5ec99ed22bf01abfa6e0904b697')
+TRANSLATE_FIELD = 1
 
 
 def generate(editor):
@@ -17,8 +24,11 @@ def generate(editor):
         return
 
     # populate fields
-    for idx, field in enumerate(editor.note.fields):
-        editor.note.fields[idx] += " GENUM"
+    # for idx, field in enumerate(editor.note.fields):
+    #     editor.note.fields[idx] += " GENUM"
+    translated = translator.translate(fields[0], 'ru')
+    if translated['code'] == 200:
+        editor.note.fields[TRANSLATE_FIELD] = ", ".join(translated['text'])
 
     # reload the note to display changes
     editor.loadNote()
