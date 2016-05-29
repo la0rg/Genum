@@ -10,6 +10,9 @@ from GenumCore.vendor.yandextranslate import yandex_translate
 # Card template
 TO_TRANSLATE = 0
 TRANSLATED_FIELD = 1
+CONTEXT_TRANSLATE = 2
+CONTEXT = 3
+TRANSCRIPTION = 4
 FOREIGN_PRONUNCIATION = 5
 IMAGE = 6
 
@@ -41,15 +44,23 @@ def generate(editor):
 
     # Russian translation by Yandex.Translator
     translated = ya_translator.translate(word_to_translate, 'ru')
+    # TODO: duplication of success check, extract translation by yandex to particular function
     if translated['code'] == 200:
         editor.note.fields[TRANSLATED_FIELD] = ", ".join(translated['text'])
 
     # Working with Collins dictionary:
     try:
-        editor.note.fields[FOREIGN_PRONUNCIATION] = collins.get_pronunciation(word=word_to_translate)
+        editor.note.fields[FOREIGN_PRONUNCIATION] = collins.get_pronunciation(word_to_translate)
+        context_list = collins.get_context_list(word_to_translate)
+        editor.note.fields[CONTEXT] = process_context(context_list, word_to_translate)
+        # TODO: translate by one request and save split by lines (<br> tag)
+        translated_context = ya_translator.translate("  ".join(context_list), 'ru')
+        if translated_context['code'] == 200:
+            editor.note.fields[CONTEXT_TRANSLATE] = translated_context['text'][0]  # TODO: check for null
     except CollinsError, e:
         showInfo("Warning: " + e.msg)
 
+    # Working with Bing Search
     image_search_result = PyBingImageSearch(BING_API_KEY, word_to_translate, image_filters='Size:Medium') \
         .search(limit=1, format='json')
     if image_search_result:
@@ -57,6 +68,20 @@ def generate(editor):
 
     # reload the note to display changes
     editor.loadNote()
+
+
+def process_context(context_list, word):
+    context_list_bold = [bold_word(context, word) for context in context_list]
+    return "<br>".join(context_list_bold)
+
+
+def bold_word(statement, word):
+    words = statement.split()
+    for i, w in enumerate(words):
+        index = w.find(word)
+        if index != -1:
+            words[i] = '<b>%s</b>' % w
+    return " ".join(words)
 
 
 def setup_buttons(editor):

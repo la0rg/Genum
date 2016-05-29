@@ -1,5 +1,7 @@
 import json
 
+from bs4 import BeautifulSoup
+
 from GenumCore.vendor.collinsapi import collins
 
 
@@ -31,6 +33,20 @@ class Collins:
                                                                     entryId=entry_id,
                                                                     lang='us'))
         return pronunciation[0]['pronunciationUrl']
+
+    def get_context_list(self, word):
+        self._fields_not_empty()
+        result = json.loads(self._api.searchFirst(dictionaryCode=self._dictionary,
+                                                  searchWord=word))
+        if not result or not result['entryContent']:
+            raise CollinsError('Error on trying to get context on word: ' + word)
+        html = result['entryContent']
+        soup = BeautifulSoup(html, 'html.parser')
+        # Two examples are usually enough
+        elements = soup.findAll('span', 'quote')
+        if len(elements) > 2:
+            elements = elements[:2]
+        return [element.get_text() for element in elements]
 
 
 class CollinsError(RuntimeError):
