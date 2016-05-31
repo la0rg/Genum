@@ -45,11 +45,7 @@ def generate(editor):
         return
 
     # Russian translation by Yandex.Translator
-    translated = ya_translator.translate(word_to_translate, 'ru')
-    ya_dict.lookup(word_to_translate)
-    # TODO: duplication of success check, extract translation by yandex to particular function
-    if translated['code'] == 200:
-        editor.note.fields[TRANSLATED_FIELD] = ", ".join(translated['text'])
+    editor.note.fields[TRANSLATED_FIELD] = ya_dict.get_definition_by_pos(word_to_translate)
 
     # Working with Collins dictionary:
     try:
@@ -62,8 +58,7 @@ def generate(editor):
         translated_context = ya_translator.translate("  ".join(context_list), 'ru')
         if translated_context['code'] == 200:
             editor.note.fields[CONTEXT_TRANSLATE] = translated_context['text'][0]  # TODO: check for null
-        editor.note.fields[TRANSCRIPTION] = process_list(collins.get_transcriptions_list(word_to_translate),
-                                                         word_to_translate)
+        editor.note.fields[TRANSCRIPTION] = collins.get_transcriptions_list(word_to_translate)[0]
     except CollinsError, e:
         showInfo("Warning: " + e.msg)
 
@@ -72,6 +67,9 @@ def generate(editor):
         .search(limit=1, format='json')
     if image_search_result and image_search_result[0].media_url:
         editor.note.fields[IMAGE] = editor.urlToFile(image_search_result[0].media_url)
+
+    # Note somehow lose the word to translate. And we need to put it in the list again.
+    editor.note.fields[TO_TRANSLATE] = word_to_translate
 
     # reload the note to display changes
     editor.loadNote()
