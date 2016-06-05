@@ -1,13 +1,3 @@
-from pprint import pprint
-
-from anki.hooks import addHook
-from aqt.utils import showInfo
-
-from GenumCore.Collins import Collins, CollinsError
-from GenumCore.YandexDict import YandexDict
-from GenumCore.vendor.bingsearch.py_bing_search import PyBingImageSearch
-from GenumCore.vendor.yandextranslate import yandex_translate
-
 # Card template
 TO_TRANSLATE = 0
 TRANSLATED_FIELD = 1
@@ -16,6 +6,24 @@ CONTEXT = 3
 TRANSCRIPTION = 4
 FOREIGN_PRONUNCIATION = 5
 IMAGE = 6
+
+import os
+import sys
+
+# add vendor directory to module search path
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+genum_core_dir = os.path.join(parent_dir, 'GenumCore')
+vendor_dir = os.path.join(genum_core_dir, 'vendor')
+sys.path.append(genum_core_dir)
+sys.path.append(vendor_dir)
+
+from anki.hooks import addHook
+from aqt.utils import showInfo
+
+from Collins import Collins, CollinsError
+from YandexDict import YandexDict
+from bingsearch.py_bing_search import PyBingImageSearch
+from yandextranslate import yandex_translate
 
 # Collins dictionary
 COLLINS_ACCESS_KEY = 'Enter the collins dictionary key here!'
@@ -32,13 +40,16 @@ collins = Collins(access_key=COLLINS_ACCESS_KEY, dictionary=DICTIONARY_CODE)
 
 
 def generate(editor):
+    if COLLINS_ACCESS_KEY == 'Enter API key here!' or BING_API_KEY == 'Enter API key here!':
+        showInfo("Please fill API keys. (Tools -> Add-ons -> Genum -> Edit...)")
+        return
+
     # Get the ForeignWord field.
     editor.loadNote()
     editor.web.setFocus()
     editor.web.eval("focusField(0);")
     editor.web.eval("caretToEnd();")
     word_to_translate = editor.note.fields[TO_TRANSLATE]
-    pprint(editor.note)
     # check that ForeignWord is not empty
     if word_to_translate == "":
         showInfo("ForeignWord should not be empty.")
@@ -59,7 +70,7 @@ def generate(editor):
         if translated_context['code'] == 200:
             editor.note.fields[CONTEXT_TRANSLATE] = translated_context['text'][0]  # TODO: check for null
         editor.note.fields[TRANSCRIPTION] = collins.get_transcriptions_list(word_to_translate)[0]
-    except CollinsError, e:
+    except CollinsError as e:
         showInfo("Warning: " + e.msg)
 
     # Working with Bing Search

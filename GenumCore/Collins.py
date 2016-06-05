@@ -1,9 +1,7 @@
 import json
 
 from bs4 import BeautifulSoup
-
-from GenumCore.vendor.collinsapi import collins
-
+from collinsapi import collins
 
 class Collins:
     """ Collins encapsulates logic of working with Collins dictionary API"""
