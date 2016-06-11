@@ -141,7 +141,7 @@ table {
 th, td {
   text-align:left;
   padding:5px 10px;
-  border-bottom:1px solid #e5e5e5;
+  border:1px solid #e5e5e5;
 }
 
 dt {
@@ -155,6 +155,19 @@ th {
 
 img {
   max-width:100%;
+}
+
+a.thumbnail {
+    display: inline-block;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px;
+    transition: 0.3s;
+    width:70%;
+}
+
+a.thumbnail:hover {
+    box-shadow: 0 0 2px 1px rgba (0, 140, 186, 0.5);
 }
 
 header {
@@ -171,11 +184,11 @@ header ul {
   background: #f4f4f4;
   border-radius:5px;
   border:1px solid #e0e0e0;
-  width:270px;
+  width:300px;
 }
 
 header li {
-  width:89px;
+  width:149px;
   float:left;
   border-right:1px solid #e0e0e0;
   height:40px;
@@ -199,6 +212,11 @@ header ul a {
   height:34px;
 }
 
+header ul a img {
+    float:left;
+    padding-left:10px;
+}
+
 header ul a:hover {
   color:#999;
 }
@@ -210,11 +228,6 @@ header ul a:active {
 strong {
   color:#222;
   font-weight:700;
-}
-
-header ul li + li + li {
-  border-right:none;
-  width:89px;
 }
 
 header ul a strong {
@@ -310,8 +323,8 @@ footer {
     width:99%;
   }
 
-  header li, header ul li + li + li {
-    width:33%;
+  header li, header ul li {
+    width:100%;
   }
 }
 
