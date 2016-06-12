@@ -3,6 +3,11 @@ import json
 import requests
 
 
+class YandexDictException(Exception):
+    def __init__(self, msg):
+        self.msg = msg
+
+
 class YandexDict:
     base_url = 'https://dictionary.yandex.net/api/v1/dicservice.json/lookup?key={}&lang={}'
 
@@ -11,10 +16,14 @@ class YandexDict:
 
     def lookup(self, word):
         url = self._url + '&text=' + word
-        resp = requests.request('GET', url)
-        if resp and resp.status_code == 200:
-            return json.loads(resp.text)
-        return
+        try:
+            resp = requests.request('GET', url)
+            if resp and resp.status_code == 200:
+                return json.loads(resp.text)
+            else:
+                raise Exception()
+        except Exception:
+            raise YandexDictException("YandexDictError while trying to lookup: %s" % word)
 
     def get_definition_by_pos(self, word):
         '''
@@ -26,7 +35,7 @@ class YandexDict:
             defenitions = json['def']
             # Go through all parts of speech
             for definition in defenitions:
-                result += "<span style=\"color:gray;font-size:12px;font-style:italic;\">" + \
+                result += "<span style=\"color:gray;font-size:16px;font-style:italic;\">" + \
                           definition['pos'][:4] + \
                           ':</span> '
                 # No more than three translations for one part of speech

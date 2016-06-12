@@ -1,11 +1,18 @@
 # Card template
-TO_TRANSLATE = 0
+# You can use -1 to not put result anywhere
+# ex.: IMAGE = -1 (if you do not want to get picture)
+TO_TRANSLATE = 0  # Word that will be translated
 TRANSLATED_FIELD = 1
 CONTEXT_TRANSLATE = 2
 CONTEXT = 3
 TRANSCRIPTION = 4
 FOREIGN_PRONUNCIATION = 5
 IMAGE = 6
+DEFINITION = 7
+
+# Parameters
+NUMBER_OF_EXAMPLES = 2  # How many context statements would be (number of context translations will be the same)
+NUMBER_OF_DEFINITIONS = 2  # How many definitions in the original language would be
 
 # Collins dictionary
 COLLINS_ACCESS_KEY = 'Enter API key here!'

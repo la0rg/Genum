@@ -12,5 +12,7 @@ cd "$cdr"
 echo "Copying new version of Genum"
 ls
 cp Genum.py "$addons_folder"
+cp LICENSE.md "$addons_folder"
+cp README.md "$addons_folder"
 cp -r GenumCore/ "$addons_folder"
 echo "Genum deploy is finished"
