@@ -35,14 +35,22 @@ vendor_dir = os.path.join(genum_core_dir, 'vendor')
 sys.path.append(genum_core_dir)
 sys.path.append(vendor_dir)
 
+from aqt import mw
 from anki.hooks import addHook
+from aqt.qt import *
 from GenumCore import Core
+from GenumCore import CardTemplate
 
 
 def setup_buttons(editor):
-    editor._addButton("Genum", lambda ed=editor: Core.generate(ed), text="GM", tip="Generate document (Ctrl+g)",
+    editor._addButton("help-hint", lambda ed=editor: Core.generate(ed), tip="Genum start (Ctrl+g)",
                       key="Ctrl+g")
 
-
+# add Genum button to the editor form
 addHook("setupEditorButtons", setup_buttons)
-print("Genum starts")
+
+# create a new menu item, and add it to the tools menu
+action = QAction("Create Genum card template...", mw)
+action.setIcon(QIcon(':/icons/help-hint.png'))
+mw.connect(action, SIGNAL("triggered()"), CardTemplate.create_genum_card_type)
+mw.form.menuTools.addAction(action)
