@@ -11,6 +11,8 @@ ya_dict = YandexDict(api_key=Genum.YANDEX_DICT)
 collins = Collins(access_key=Genum.COLLINS_ACCESS_KEY, dictionary=Genum.DICTIONARY_CODE)
 
 log.basicConfig(level=log.WARNING)
+pics = ("jpg", "jpeg", "png", "tif", "tiff", "gif", "svg", "webp")
+audio = ("wav", "mp3", "ogg", "flac", "mp4", "swf", "mov", "mpeg", "mkv", "m4a", "3gp", "spx", "oga")
 
 
 def generate(editor):
@@ -46,7 +48,9 @@ def generate(editor):
         if Genum.FOREIGN_PRONUNCIATION != -1:
             pronunciation_url = collins.get_pronunciation(word_to_translate)
             if pronunciation_url:
-                editor.note.fields[Genum.FOREIGN_PRONUNCIATION] = editor.urlToFile(pronunciation_url)
+                url = editor.urlToFile(cut_url(pronunciation_url))
+                if url:
+                    editor.note.fields[Genum.FOREIGN_PRONUNCIATION] = url
             else:
                 log.warning('Cannot find pronunciation for the word: %s' % word_to_translate)
                 showInfo("Cannot find pronunciation")
@@ -99,7 +103,9 @@ def generate(editor):
             image_search_result = PyBingImageSearch(Genum.BING_API_KEY, word_to_translate, image_filters='Size:Medium') \
                 .search(limit=1, format='json')
             if image_search_result and image_search_result[0].media_url:
-                editor.note.fields[Genum.IMAGE] = editor.urlToFile(image_search_result[0].media_url)
+                url = editor.urlToFile(cut_url(image_search_result[0].media_url))
+                if url:
+                    editor.note.fields[Genum.IMAGE] = url
             else:
                 log.warning('Cannot find image for the word: %s' % word_to_translate)
                 showInfo("Cannot find image")
@@ -125,3 +131,16 @@ def bold_word(statement, word):
         if index != -1:
             words[i] = '<b>%s</b>' % w
     return " ".join(words)
+
+
+def cut_url(url):
+    # If url do not ends with only media extension it's probably somewhere in the middle and we need to cut this
+    ends = url[url.rfind(".") + 1:]
+    if ends not in pics + audio:
+        for suffix in pics + audio:
+            pos = url.rfind(suffix)
+            if pos != -1:
+                return url[:pos + len(suffix)]
+    # If no suffix was found the url is broken, nothing to do with it
+    # If url ends with extension it's ok
+    return url
