@@ -5,12 +5,14 @@ from bingsearch.py_bing_search import PyBingImageSearch, PyBingImageException
 from yandextranslate import yandex_translate
 import Genum
 import logging as log
+import os
 
 ya_translator = yandex_translate.YandexTranslate(key=Genum.YANDEX_TRANSLATOR)
 ya_dict = YandexDict(api_key=Genum.YANDEX_DICT)
 collins = Collins(access_key=Genum.COLLINS_ACCESS_KEY, dictionary=Genum.DICTIONARY_CODE)
 
-log.basicConfig(level=log.WARNING)
+parent_dir = os.path.abspath(os.path.dirname(__file__))
+log.basicConfig(filename=parent_dir+"/genum.log", level=log.WARNING)
 pics = ("jpg", "jpeg", "png", "tif", "tiff", "gif", "svg", "webp")
 audio = ("wav", "mp3", "ogg", "flac", "mp4", "swf", "mov", "mpeg", "mkv", "m4a", "3gp", "spx", "oga")
 
@@ -18,7 +20,7 @@ audio = ("wav", "mp3", "ogg", "flac", "mp4", "swf", "mov", "mpeg", "mkv", "m4a",
 def generate(editor):
     if any(key == 'Enter API key here!'
            for key in (Genum.COLLINS_ACCESS_KEY, Genum.BING_API_KEY, Genum.YANDEX_DICT, Genum.YANDEX_TRANSLATOR)):
-        showInfo("Please fill API keys. (Tools -> Add-ons -> Genum -> Edit...)")
+        showInfo("Please fill API keys. (Tools -> Add-ons -> Genum -> Edit...)", parent=editor.parentWindow)
         return
 
     # Get the ForeignWord field.
@@ -26,7 +28,7 @@ def generate(editor):
     word_to_translate = editor.note.fields[Genum.TO_TRANSLATE]
     # check that ForeignWord is not empty
     if word_to_translate == "":
-        showInfo("ForeignWord should not be empty.")
+        showInfo("ForeignWord should not be empty.", parent=editor.parentWindow)
         return
 
     # Russian translation by Yandex.Dictionary
@@ -37,10 +39,10 @@ def generate(editor):
                 editor.note.fields[Genum.TRANSLATED_FIELD] = translation
             else:
                 log.warning("Cannot find translation")
-                showInfo("Cannot find translation")
+                showInfo("Cannot find translation", parent=editor.parentWindow)
         except YandexDictException as e:
             log.error(e.msg)
-            showInfo("Could not find translation for the word")
+            showInfo("Could not find translation for the word", parent=editor.parentWindow)
 
     # Working with Collins dictionary to get pronunciation, context and definition:
     context_list = None
@@ -53,31 +55,31 @@ def generate(editor):
                     editor.note.fields[Genum.FOREIGN_PRONUNCIATION] = url
             else:
                 log.warning('Cannot find pronunciation for the word: %s' % word_to_translate)
-                showInfo("Cannot find pronunciation")
+                showInfo("Cannot find pronunciation", parent=editor.parentWindow)
         if Genum.CONTEXT != -1:
             context_list = collins.get_context_list(word_to_translate)
             if context_list:
                 editor.note.fields[Genum.CONTEXT] = process_list(context_list, word_to_translate)
             else:
                 log.warning('Cannot find examples(context) for the word: %s' % word_to_translate)
-                showInfo("Cannot find examples(context)")
+                showInfo("Cannot find examples(context)", parent=editor.parentWindow)
         if Genum.DEFINITION != -1:
             definition_list = collins.get_definitions_list(word_to_translate)
             if definition_list:
                 editor.note.fields[Genum.DEFINITION] = process_list(definition_list, word_to_translate)
             else:
                 log.warning('Cannot find definitions for the word: %s' % word_to_translate)
-                showInfo("Cannot find definitions")
+                showInfo("Cannot find definitions", parent=editor.parentWindow)
         if Genum.TRANSCRIPTION != -1:
             transcription = collins.get_transcriptions_list(word_to_translate)
             if transcription:
                 editor.note.fields[Genum.TRANSCRIPTION] = transcription[0]
             else:
                 log.warning('Cannot find transcription for the word: %s' % word_to_translate)
-                showInfo("Cannot find transcription")
+                showInfo("Cannot find transcription", parent=editor.parentWindow)
     except CollinsError as e:
-        log.error(e.msg)
-        showInfo("Cannot get info from Collins dictionary")
+        log.warning(e.msg)
+        showInfo("Cannot get info from Collins dictionary", parent=editor.parentWindow)
 
     # Working with Yandex translator to translate context (examples)
     if context_list and Genum.CONTEXT_TRANSLATE != -1:
@@ -108,7 +110,7 @@ def generate(editor):
                     editor.note.fields[Genum.IMAGE] = url
             else:
                 log.warning('Cannot find image for the word: %s' % word_to_translate)
-                showInfo("Cannot find image")
+                showInfo("Cannot find image", parent=editor.parentWindow)
         except PyBingImageException as e:
             log.error(e.msg)
 
