@@ -1,28 +1,29 @@
 from aqt import mw
 
-front = """<div class=word>{{word}}</div>
-            <div class=transc>[{{transcription}}]</div>
-            [sound:{{sound}}]
-            <div class=cont>{{context}}</div>
-            <div class=cont>{{definition}}</div>
+front = """
+        <div class=word>{{word}}</div>
+        <div class=transc>[{{transcription}}]</div> \
+        [sound:{{sound}}]
+        <div class=mid>{{context}}</div>
+        <div class=small>{{definition}}</div>
         """
 back = """
-            {{FrontSide}}
-            <hr id=answer>
-            <div class=transl>{{translation}}</div>
-            <div class=cont>{{context_translation}}</div>
-            <img src=\"{{image}}\">
+        {{FrontSide}}
+        <hr id=answer>
+        <div class=transl>{{translation}}</div>
+        <div class=mid>{{context_translation}}</div><br>
+        <img style="width:180px" src="{{image}}">
         """
 css = """
-        .card {
-            font-family: Arial,sans-serif;
-            text-align: center;
-            background-color: #F5F2E7; }
-        .word { font-size: 28px; color: #333333; }
+        .card { font-family: Arial,sans-serif; text-align: center; background-color: #F5F2E7; }
+        .word { font-size: 28px; color: purple; }
         .transc { font-size: 16px; color: #317FC0; font-family: Arial Unicode MS; }
-        .transl { font-size: 22px; color: #995B36; margin: 0 0 10px; }
-        .cont { font-size: 15px; font-style: italic; color: #666666; margin: 10px 0 0; } .cont b { color: green !important; }
-    """
+        .transl { font-size: 22px; color: purple; margin: 0 0 10px; }
+        .small { font-size: 14px; font-style: italic; color: #111111; margin: 10px 0 0; }
+        .small b { color:#317FC0 !important; }
+        .mid { font-size: 17px; font-style: italic; color: #222222; margin: 10px 0 0; }
+        .mid b { color: #317FC0 !important; }
+        """
 fields_names = ['word',
                 'translation',
                 'context_translation',
