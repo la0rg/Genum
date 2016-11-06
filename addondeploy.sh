@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 
 cdr="$PWD"
-addons_folder="/home/la0rg/Documents/Anki/addons/"
+addons_folder="${HOME}/Documents/Anki/addons/"
 genum_core_folder="${addons_folder}GenumCore/"
 echo "Cleaning addon folder"
 cd "$addons_folder"
 rm Genum.py Genum.pyc
-rm -r GenumCore/
-echo "Cleaning if finished"
+rm -rf GenumCore/
+echo "Cleaning is finished"
 cd "$cdr"
 
 echo "Copying new version of Genum"

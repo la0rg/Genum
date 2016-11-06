@@ -1,4 +1,5 @@
 # Card template
+# Numbers are used to fill certain field position in a template, if you use custom template please redefine variables
 # You can use -1 to not put result anywhere
 # ex.: IMAGE = -1 (if you do not want to get picture)
 TO_TRANSLATE = 0  # Word that will be translated
@@ -14,16 +15,18 @@ DEFINITION = 7
 NUMBER_OF_EXAMPLES = 2  # How many context statements would be (number of context translations will be the same)
 NUMBER_OF_DEFINITIONS = 2  # How many definitions in the original language would be
 
-# Collins dictionary
-COLLINS_ACCESS_KEY = 'Enter API key here!'
-DICTIONARY_CODE = 'american-learner'
+# Oxford dictionary
+OXFORD_APP_KEY = 'Enter API key here!'
+OXFORD_APP_ID = 'Enter API key here!'
+# Available regions: 'us' and 'gb'
+OXFORD_REGION = 'us'
 
 # Bing Search
 BING_API_KEY = 'Enter API key here!'
 
 # Yandex.Translator
-YANDEX_TRANSLATOR = "trnsl.1.1.20160518T163740Z.4a96ea038dcee5ab.1765897e66cff5ec99ed22bf01abfa6e0904b697"
-YANDEX_DICT = "dict.1.1.20160529T105443Z.487dc552af9569ab.fff2fb073ab287a5f5d843318bc8fcf1a000cf3f"
+YANDEX_TRANSLATOR = "Enter API key here!"
+YANDEX_DICT = "Enter API key here!"
 
 import os
 import sys
@@ -46,10 +49,11 @@ def setup_buttons(editor):
     editor._addButton("help-hint", lambda ed=editor: Core.generate(ed), tip="Genum start (Ctrl+g)",
                       key="Ctrl+g")
 
+
 # add Genum button to the editor form
 addHook("setupEditorButtons", setup_buttons)
 
-# create a new menu item, and add it to the tools menu
+# create a new menu item for creation of default template, and add it to the tools menu
 action = QAction("Create Genum card template...", mw)
 action.setIcon(QIcon(':/icons/help-hint.png'))
 mw.connect(action, SIGNAL("triggered()"), CardTemplate.create_genum_card_type)
